@@ -2,7 +2,7 @@ package populateDb
 
 import (
 	"app/constants"
-	dbConn "app/database"
+	"app/database"
 	fileutil "app/fileUtil"
 	"app/models"
 	"context"
@@ -99,7 +99,7 @@ func populateDb() {
 
 func updateDb(items []models.StateObject) {
 
-	var userCollection = dbConn.Db().Database(fileutil.AppConfigProperties["database"]).Collection(fileutil.AppConfigProperties["collection"])
+	var userCollection = database.Db().Database(fileutil.AppConfigProperties["database"]).Collection(fileutil.AppConfigProperties["collection"])
 
 	totalCount := 0.0
 

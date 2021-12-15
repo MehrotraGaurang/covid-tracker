@@ -2,7 +2,7 @@ package userApi
 
 import (
 	"app/cache"
-	dbConn "app/database"
+	"app/database"
 	fileutil "app/fileUtil"
 	"app/models"
 	"os"
@@ -109,7 +109,7 @@ func getCovidData(stateCode string) models.StateObject {
 
 	fmt.Println("Starting to get data now for ", stateCode)
 
-	var userCollection = dbConn.Db().Database(fileutil.AppConfigProperties["database"]).Collection(fileutil.AppConfigProperties["collection"])
+	var userCollection = database.Db().Database(fileutil.AppConfigProperties["database"]).Collection(fileutil.AppConfigProperties["collection"])
 
 	filterCursor, err := userCollection.Find(context.TODO(), bson.M{"statecode": stateCode})
 
