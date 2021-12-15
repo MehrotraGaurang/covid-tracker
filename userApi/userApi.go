@@ -5,6 +5,7 @@ import (
 	dbConn "app/database"
 	fileutil "app/fileUtil"
 	"app/models"
+	"os"
 	"strings"
 
 	"context"
@@ -159,7 +160,11 @@ func Main() {
 	// Routes
 	e.GET("/count", getStateCount)
 
+	port := os.Getenv("PORT")
+
+	fmt.Println("Listening on", port)
+
 	// Start server
-	e.Logger.Fatal(e.Start(":9090"))
+	e.Logger.Fatal(e.Start(":" + port))
 
 }
