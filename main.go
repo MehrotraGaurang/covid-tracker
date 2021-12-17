@@ -1,9 +1,8 @@
 package main
 
 import (
+	"app/API"
 	fileutil "app/fileUtil"
-	"app/populateDb"
-	"app/userApi"
 	"fmt"
 )
 
@@ -16,9 +15,9 @@ func main() {
 	// fmt.Println(fileutil.AppConfigProperties)
 
 	fmt.Println("Starting populate db")
-	go populateDb.Main()
+	go API.StartPopulating()
 
 	fmt.Println("Starting User API")
-	userApi.Main()
+	API.Main()
 
 }
