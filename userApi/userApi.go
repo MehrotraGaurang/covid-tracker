@@ -4,11 +4,8 @@ import (
 	"app/cache"
 	"app/database"
 	fileutil "app/fileUtil"
-	"app/models"
-	"os"
 	"strings"
 
-	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -19,7 +16,6 @@ import (
 
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
-	"go.mongodb.org/mongo-driver/bson"
 )
 
 func getStateCount(c echo.Context) error {
@@ -42,12 +38,12 @@ func getStateCount(c echo.Context) error {
 
 		fmt.Println("Statecode not found, caching it: ", stateCode)
 
-		countData = getCovidData(stateCode)
-		cache.StoreInRedis(countData)
+		countData = database.GetCovidData(stateCode)
+		cache.StoreInRedis(countData, 30*time.Minute)
 
 	}
 
-	countDataIndia := getCovidData("IN")
+	countDataIndia := database.GetCovidData("IN")
 
 	retData := map[string]interface{}{stateCode: countData, "IN": countDataIndia}
 
@@ -95,58 +91,9 @@ func getStateCode(lat string, long string) string {
 		log.Fatal(jsonErr)
 	}
 
-	// fmt.Println(jsonMap["data"])
-
 	stateCode := jsonMap["data"].([]interface{})[0].(map[string]interface{})["region_code"].(string)
 
-	// fmt.Println("Getting State Code:")
-	// fmt.Println("Hello---", stateCode)
-
 	return stateCode
-}
-
-func getCovidData(stateCode string) models.StateObject {
-
-	fmt.Println("Starting to get data now for ", stateCode)
-
-	var userCollection = database.Db().Database(fileutil.AppConfigProperties["database"]).Collection(fileutil.AppConfigProperties["collection"])
-
-	filterCursor, err := userCollection.Find(context.TODO(), bson.M{"statecode": stateCode})
-
-	fmt.Println("Data is here")
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	var stateInfoBlocks []models.StateObject
-
-	fmt.Println("Initializing StateObject list")
-
-	if err = filterCursor.All(context.TODO(), &stateInfoBlocks); err != nil {
-		log.Fatal(err)
-	}
-
-	if len(stateInfoBlocks) == 0 {
-		var stateObj models.StateObject
-		return stateObj
-	}
-
-	fmt.Println("Now filtering it!")
-
-	var maxLastTime = stateInfoBlocks[0]
-
-	for i := 1; i < len(stateInfoBlocks); i++ {
-
-		item := stateInfoBlocks[i]
-
-		if maxLastTime.LastUpdated.Before(item.LastUpdated) {
-			maxLastTime = item
-		}
-
-	}
-
-	return maxLastTime
 }
 
 func Main() {
@@ -160,7 +107,8 @@ func Main() {
 	// Routes
 	e.GET("/count", getStateCount)
 
-	port := os.Getenv("PORT")
+	// port := os.Getenv("PORT")
+	port := "9090"
 
 	fmt.Println("Listening on", port)
 

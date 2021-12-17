@@ -1,11 +1,10 @@
 package populateDb
 
 import (
+	"app/cache"
 	"app/constants"
 	"app/database"
-	fileutil "app/fileUtil"
 	"app/models"
-	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -21,14 +20,14 @@ func doEvery(d time.Duration, f func()) {
 }
 
 func Main() {
-	doEvery(24*time.Hour, populateDb)
+	doEvery(6*time.Hour, populateDb)
 }
 
 func populateDb() {
 
-	fmt.Println(constants.StateCodes)
+	// fmt.Println(constants.StateCodes)
 
-	url := "https://data.covid19india.org/v4/min/data.min.json"
+	url := "https://api.rootnet.in/covid19-in/stats/latest"
 
 	spaceClient := http.Client{
 		Timeout: time.Minute * 2, // Timeout after 2 minutes
@@ -62,71 +61,56 @@ func populateDb() {
 
 	var stateObjects []models.StateObject
 
-	for key, value := range jsonMap {
+	lastUpdate, err := time.Parse(constants.Layout, jsonMap["lastRefreshed"].(string))
 
-		switch concreteVal := value.(type) {
+	if err != nil {
+		fmt.Println(err)
+		lastUpdate = time.Now()
+	}
 
-		case map[string]interface{}:
+	if isDataUpdatedAtApi(lastUpdate) {
+		var indiaObject models.StateObject
+
+		indiaObject.LastUpdated = lastUpdate
+		indiaObject.StateCode = "IN"
+		indiaObject.StateName = "India"
+		indiaObject.TotalNo = jsonMap["data"].(map[string]interface{})["summary"].(map[string]interface{})["total"].(float64)
+
+		stateObjects = append(stateObjects, indiaObject)
+
+		stateInfo := jsonMap["data"].(map[string]interface{})["regional"].([]interface{})
+
+		for _, value := range stateInfo {
 
 			var stateObject models.StateObject
 
-			stateObject.StateCode = key
+			value := value.(map[string]interface{})
 
-			// fmt.Println(stateObject.StateCode)
+			stateName := value["loc"].(string)
 
-			confirmed := concreteVal["total"].(map[string]interface{})
-
-			stateObject.LastUpdated = time.Now()
-
-			if confirmed["confirmed"] != nil {
-				stateObject.TotalNo = confirmed["confirmed"].(float64)
-
-			} else {
-				stateObject.TotalNo = 0
-			}
+			stateObject.LastUpdated = lastUpdate
+			stateObject.StateCode = constants.StateCodes[stateName]
+			stateObject.StateName = stateName
+			stateObject.TotalNo = value["totalConfirmed"].(float64)
 
 			stateObjects = append(stateObjects, stateObject)
-
-		default:
-			fmt.Println()
 		}
 
-	}
+		database.UpdateDb(stateObjects)
 
-	updateDb(stateObjects)
+	} else {
+		fmt.Printf("No new TimeStamp to update DB!")
+	}
 
 }
 
-func updateDb(items []models.StateObject) {
+func isDataUpdatedAtApi(lastUpdated time.Time) bool {
 
-	var userCollection = database.Db().Database(fileutil.AppConfigProperties["database"]).Collection(fileutil.AppConfigProperties["collection"])
+	oldTs := cache.GetTs()
 
-	totalCount := 0.0
-
-	for _, item := range items {
-
-		totalCount += item.TotalNo
-
-		_, err := userCollection.InsertOne(context.TODO(), item)
-
-		if err != nil {
-			log.Fatal(err)
-		}
-
+	if oldTs.IsZero() || oldTs.Before(lastUpdated) {
+		cache.StoreTs(lastUpdated)
+		return true
 	}
-
-	var indiaObject models.StateObject
-
-	indiaObject.TotalNo = totalCount
-	indiaObject.StateCode = "IN"
-	indiaObject.LastUpdated = time.Now()
-
-	insertResult, err := userCollection.InsertOne(context.TODO(), indiaObject)
-
-	if err != nil {
-		log.Fatal((err))
-	}
-
-	fmt.Println("Inserted record for India total count: ", indiaObject.TotalNo, ", ", insertResult)
-
+	return false
 }

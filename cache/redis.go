@@ -1,6 +1,7 @@
 package cache
 
 import (
+	"app/constants"
 	fileutil "app/fileUtil"
 	"app/models"
 	"context"
@@ -35,7 +36,7 @@ func getRdb() *redis.Client {
 	return rdb
 }
 
-func StoreInRedis(stateObj models.StateObject) {
+func StoreInRedis(stateObj models.StateObject, duration time.Duration) {
 
 	fmt.Println("Caching statecode for 30min", stateObj.StateCode)
 
@@ -47,7 +48,7 @@ func StoreInRedis(stateObj models.StateObject) {
 		panic(err)
 	}
 
-	err = rdb.Set(ctx, stateObj.StateCode, stateObjStr, 30*time.Minute).Err()
+	err = rdb.Set(ctx, stateObj.StateCode, stateObjStr, duration).Err()
 	if err != nil {
 		panic(err)
 	}
@@ -77,4 +78,37 @@ func GetFromRedis(stateCode string) models.StateObject {
 
 	return stateObject
 
+}
+
+func StoreTs(ts time.Time) {
+	fmt.Println("Caching timestamp", ts)
+
+	rdb := getRdb()
+
+	err := rdb.Set(ctx, "timestamp", ts, 0).Err()
+
+	if err != nil {
+		panic(err)
+	}
+}
+
+func GetTs() time.Time {
+
+	fmt.Println("Getting last saved timestamp")
+
+	rdb := getRdb()
+
+	value, err := rdb.Get(ctx, "timestamp").Result()
+	if err != nil {
+		panic(err)
+	}
+
+	timeStamp, error := time.Parse(constants.Layout, value)
+	if error != nil {
+		panic(err)
+	}
+
+	fmt.Print("Cached TS is", timeStamp)
+
+	return timeStamp
 }
