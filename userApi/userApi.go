@@ -4,6 +4,7 @@ import (
 	"app/cache"
 	"app/database"
 	fileutil "app/fileUtil"
+	"os"
 	"strings"
 
 	"encoding/json"
@@ -107,8 +108,7 @@ func Main() {
 	// Routes
 	e.GET("/count", getStateCount)
 
-	// port := os.Getenv("PORT")
-	port := "9090"
+	port := os.Getenv("PORT")
 
 	fmt.Println("Listening on", port)
 
