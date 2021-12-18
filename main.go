@@ -16,8 +16,8 @@ import (
 // @description Track covid numbers for a state and India
 // @version 1.0
 // @schemes https
-// @host dashboard.heroku.com
-// @BasePath /apps/dry-wave-91626
+// @host dry-wave-91626.herokuapp.com
+// @BasePath /
 func main() {
 	fmt.Println("Starting Both APIs")
 
