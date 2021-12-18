@@ -15,8 +15,9 @@ import (
 // @title Covid Tracker
 // @description Track covid numbers for a state and India
 // @version 1.0
-// @host localhost:9090
-// @BasePath /
+// @schemes https
+// @host dashboard.heroku.com
+// @BasePath /apps/dry-wave-91626
 func main() {
 	fmt.Println("Starting Both APIs")
 
@@ -46,6 +47,6 @@ func main() {
 	fmt.Println("Listening on", port)
 
 	// Start server
-	e.Logger.Fatal(e.Start(":9090"))
+	e.Logger.Fatal(e.Start(":" + port))
 
 }
