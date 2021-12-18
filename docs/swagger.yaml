@@ -1,0 +1,49 @@
+basePath: /
+definitions:
+  models.StateObject:
+    properties:
+      lastupdated:
+        description: Last update time
+        type: string
+      statecode:
+        description: State code
+        type: string
+      statename:
+        description: State name
+        type: string
+      totalno:
+        description: Total number of cases
+        type: number
+    type: object
+host: localhost:9090
+info:
+  contact: {}
+  description: Track covid numbers for a state and India
+  title: Covid Tracker
+  version: "1.0"
+paths:
+  /count:
+    get:
+      consumes:
+      - application/json
+      description: Get Count of State and India based on location lat and long provided
+      parameters:
+      - description: Latitude Required
+        in: header
+        name: Lat
+        required: true
+        type: string
+      - description: Longitude Required
+        in: header
+        name: Long
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.StateObject'
+      summary: Get Count of State and India
+swagger: "2.0"

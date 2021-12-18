@@ -1,0 +1,72 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Track covid numbers for a state and India",
+        "title": "Covid Tracker",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "localhost:9090",
+    "basePath": "/",
+    "paths": {
+        "/count": {
+            "get": {
+                "description": "Get Count of State and India based on location lat and long provided",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get Count of State and India",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Latitude Required",
+                        "name": "Lat",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Longitude Required",
+                        "name": "Long",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.StateObject"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "models.StateObject": {
+            "type": "object",
+            "properties": {
+                "lastupdated": {
+                    "description": "Last update time",
+                    "type": "string"
+                },
+                "statecode": {
+                    "description": "State code",
+                    "type": "string"
+                },
+                "statename": {
+                    "description": "State name",
+                    "type": "string"
+                },
+                "totalno": {
+                    "description": "Total number of cases",
+                    "type": "number"
+                }
+            }
+        }
+    }
+}

@@ -5,11 +5,16 @@ import (
 	"time"
 )
 
+//swagger:model StateObject
 type StateObject struct {
-	StateCode   string    `json:"statecode"`
-	TotalNo     float64   `json:"totalno"`
+	// State code
+	StateCode string `json:"statecode"`
+	// Total number of cases
+	TotalNo float64 `json:"totalno"`
+	// Last update time
 	LastUpdated time.Time `json:"lastupdated"`
-	StateName   string    `json:"statename"`
+	//State name
+	StateName string `json:"statename"`
 }
 
 func (this StateObject) ToString() string {
