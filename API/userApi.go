@@ -57,7 +57,3 @@ func GetStateCount(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, retData)
 }
-
-func Main() {
-
-}
