@@ -1,4 +1,7 @@
 {
+    "schemes": [
+        "https"
+    ],
     "swagger": "2.0",
     "info": {
         "description": "Track covid numbers for a state and India",
@@ -6,7 +9,7 @@
         "contact": {},
         "version": "1.0"
     },
-    "host": "localhost:9090",
+    "host": "dry-wave-91626.herokuapp.com",
     "basePath": "/",
     "paths": {
         "/count": {

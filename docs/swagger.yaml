@@ -15,7 +15,7 @@ definitions:
         description: Total number of cases
         type: number
     type: object
-host: localhost:9090
+host: dry-wave-91626.herokuapp.com
 info:
   contact: {}
   description: Track covid numbers for a state and India
@@ -46,4 +46,6 @@ paths:
           schema:
             $ref: '#/definitions/models.StateObject'
       summary: Get Count of State and India
+schemes:
+- https
 swagger: "2.0"

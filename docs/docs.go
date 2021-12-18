@@ -97,9 +97,9 @@ type swaggerInfo struct {
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = swaggerInfo{
 	Version:     "1.0",
-	Host:        "localhost:9090",
+	Host:        "dry-wave-91626.herokuapp.com",
 	BasePath:    "/",
-	Schemes:     []string{},
+	Schemes:     []string{"https"},
 	Title:       "Covid Tracker",
 	Description: "Track covid numbers for a state and India",
 }
