@@ -3,30 +3,42 @@ package API
 import (
 	"app/cache"
 	"app/database"
-	"encoding/json"
+	"app/models"
 	"fmt"
 	"net/http"
-	"os"
 	"strings"
 	"time"
 
-	"github.com/labstack/echo"
-	"github.com/labstack/echo/middleware"
+	"github.com/labstack/echo/v4"
 )
 
-func getStateCount(c echo.Context) error {
+// Get Count of State and India
+// @Summary Get Count of State and India
+// @Description Get Count of State and India based on location lat and long provided
+// @Accept json
+// @Produce json
+// @Param Lat header string true "Latitude Required"
+// @Param Long header string true "Longitude Required"
+// @Success 200 {object} models.StateObject
+// @Router /count [get]
+func GetStateCount(c echo.Context) error {
 
-	json_map := make(map[string]string)
-	err := json.NewDecoder(c.Request().Body).Decode(&json_map)
-	if err != nil {
-		return err
+	var latLong models.LatLong
+
+	for key, value := range c.Request().Header {
+		fmt.Println(key)
+		if key == "Lat" {
+			latLong.Lat = value[0]
+		} else if key == "Long" {
+			latLong.Long = value[0]
+		}
 	}
 
 	fmt.Println("Getting counts now")
 
-	fmt.Println("Getting StateCode: ", json_map)
+	fmt.Println("Getting StateCode: ", latLong)
 
-	stateCode := GetStateCode(json_map["lat"], json_map["long"])
+	stateCode := GetStateCode(latLong.Lat, latLong.Long)
 
 	countData := cache.GetFromRedis(stateCode)
 
@@ -44,24 +56,4 @@ func getStateCount(c echo.Context) error {
 	retData := map[string]interface{}{stateCode: countData, "IN": countDataIndia}
 
 	return c.JSON(http.StatusOK, retData)
-}
-
-func Main() {
-
-	e := echo.New()
-
-	// Middleware
-	e.Use(middleware.Logger())
-	e.Use(middleware.Recover())
-
-	// Routes
-	e.GET("/count", getStateCount)
-
-	port := os.Getenv("PORT")
-
-	fmt.Println("Listening on", port)
-
-	// Start server
-	e.Logger.Fatal(e.Start(":" + port))
-
 }

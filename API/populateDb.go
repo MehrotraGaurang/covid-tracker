@@ -20,12 +20,11 @@ func doEvery(d time.Duration, f func()) {
 }
 
 func StartPopulating() {
+	fmt.Println("Started Populating Db")
 	doEvery(6*time.Hour, populateDb)
 }
 
 func populateDb() {
-
-	// fmt.Println(constants.StateCodes)
 
 	url := "https://api.rootnet.in/covid19-in/stats/latest"
 
