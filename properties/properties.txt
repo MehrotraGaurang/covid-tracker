@@ -1,5 +1,5 @@
 url=mongodb+srv://Gaurang98:Gaurang1998@learning.yvc9x.mongodb.net/Learning?retryWrites=true&w=majority
 reverse_geo=http://api.positionstack.com/v1/reverse?access_key=7bedee915803b8b58718e8ec34f6bffc&query=
 database=covid-db
-collection=covid-data
+collection=covid-final-data
 redis_url=redis-16803.c264.ap-south-1-1.ec2.cloud.redislabs.com:16803

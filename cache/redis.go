@@ -85,7 +85,7 @@ func StoreTs(ts time.Time) {
 
 	rdb := getRdb()
 
-	err := rdb.Set(ctx, "timestamp", ts, 0).Err()
+	err := rdb.Set(ctx, "timestamp-final", ts, 0).Err()
 
 	if err != nil {
 		panic(err)
@@ -98,9 +98,9 @@ func GetTs() time.Time {
 
 	rdb := getRdb()
 
-	value, err := rdb.Get(ctx, "timestamp").Result()
+	value, err := rdb.Get(ctx, "timestamp-final").Result()
 	if err != nil {
-		panic(err)
+		return time.Time{}
 	}
 
 	timeStamp, error := time.Parse(constants.Layout, value)

@@ -99,7 +99,7 @@ func populateDb() {
 		database.UpdateDb(stateObjects)
 
 	} else {
-		fmt.Printf("No new TimeStamp to update DB!")
+		fmt.Printf("\nNo new TimeStamp to update DB!")
 	}
 
 }
