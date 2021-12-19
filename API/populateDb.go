@@ -60,7 +60,7 @@ func populateDb() {
 
 	var stateObjects []models.StateObject
 
-	lastUpdate, err := time.Parse(constants.Layout, jsonMap["lastRefreshed"].(string))
+	lastUpdate, err := time.Parse(constants.Layout, jsonMap["lastOriginUpdate"].(string))
 
 	if err != nil {
 		fmt.Println(err)
@@ -101,7 +101,7 @@ func populateDb() {
 		database.UpdateDb(stateObjects)
 
 	} else {
-		fmt.Printf("\nNo new TimeStamp to update DB!")
+		fmt.Println("\nNo new TimeStamp to update DB!")
 	}
 
 }
