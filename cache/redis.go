@@ -14,9 +14,7 @@ import (
 
 var ctx = context.TODO()
 
-var RedisConnection *redis.Client
-
-func GetRdb() *redis.Client {
+func getRdb() *redis.Client {
 
 	rdb := redis.NewClient(&redis.Options{
 		Addr:     fileutil.AppConfigProperties["redis_url"],
@@ -48,7 +46,7 @@ func StoreInRedis(stateObj models.StateObject, duration time.Duration) {
 		panic(err)
 	}
 
-	err = RedisConnection.Set(ctx, stateObj.StateCode, stateObjStr, duration).Err()
+	err = getRdb().Set(ctx, stateObj.StateCode, stateObjStr, duration).Err()
 	if err != nil {
 		panic(err)
 	}
@@ -63,7 +61,7 @@ func GetFromRedis(stateCode string) models.StateObject {
 
 	stateObject.StateCode = "Not_Found"
 
-	value, err := RedisConnection.Get(ctx, stateCode).Result()
+	value, err := getRdb().Get(ctx, stateCode).Result()
 	if err == redis.Nil {
 		return stateObject
 	} else if err != nil {
@@ -81,7 +79,7 @@ func GetFromRedis(stateCode string) models.StateObject {
 func StoreTs(ts int64) {
 	fmt.Println("Caching timestamp", ts)
 
-	err := RedisConnection.Set(ctx, "timestamp-final", ts, 0).Err()
+	err := getRdb().Set(ctx, "timestamp-final", ts, 0).Err()
 
 	if err != nil {
 		panic(err)
@@ -92,7 +90,7 @@ func GetTs() int64 {
 
 	fmt.Println("Getting last saved timestamp")
 
-	value, err := RedisConnection.Get(ctx, "timestamp-final").Result()
+	value, err := getRdb().Get(ctx, "timestamp-final").Result()
 	if err != nil {
 		fmt.Println(err)
 		return 0

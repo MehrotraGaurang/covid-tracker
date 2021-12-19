@@ -2,7 +2,6 @@ package main
 
 import (
 	"app/API"
-	"app/cache"
 	_ "app/docs"
 	fileutil "app/fileUtil"
 	"fmt"
@@ -23,9 +22,6 @@ func main() {
 
 	// Setting Properties
 	fileutil.ReadPropertiesFile("properties/properties.txt")
-
-	fmt.Println("Estabilishing Connection to Redis")
-	cache.RedisConnection = cache.GetRdb()
 
 	fmt.Println("Starting populate db")
 	go API.StartPopulating()
