@@ -2,7 +2,7 @@
 
 ### It is available at endpoint:
 
-https://dry-wave-91626.herokuapp.com/
+https://dry-wave-91626.herokuapp.com/count
 
 ### Documentation on how to use it can be found at:
 
