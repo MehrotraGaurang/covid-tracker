@@ -1,12 +1,12 @@
 package cache
 
 import (
-	"app/constants"
 	fileutil "app/fileUtil"
 	"app/models"
 	"context"
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/go-redis/redis/v8"
@@ -14,7 +14,9 @@ import (
 
 var ctx = context.TODO()
 
-func getRdb() *redis.Client {
+var RedisConnection *redis.Client
+
+func GetRdb() *redis.Client {
 
 	rdb := redis.NewClient(&redis.Options{
 		Addr:     fileutil.AppConfigProperties["redis_url"],
@@ -40,15 +42,13 @@ func StoreInRedis(stateObj models.StateObject, duration time.Duration) {
 
 	fmt.Println("Caching statecode for 30min", stateObj.StateCode)
 
-	rdb := getRdb()
-
 	stateObjStr, err := json.Marshal(stateObj)
 
 	if err != nil {
 		panic(err)
 	}
 
-	err = rdb.Set(ctx, stateObj.StateCode, stateObjStr, duration).Err()
+	err = RedisConnection.Set(ctx, stateObj.StateCode, stateObjStr, duration).Err()
 	if err != nil {
 		panic(err)
 	}
@@ -61,11 +61,9 @@ func GetFromRedis(stateCode string) models.StateObject {
 
 	fmt.Println("Trying to get statecode", stateCode)
 
-	rdb := getRdb()
-
 	stateObject.StateCode = "Not_Found"
 
-	value, err := rdb.Get(ctx, stateCode).Result()
+	value, err := RedisConnection.Get(ctx, stateCode).Result()
 	if err == redis.Nil {
 		return stateObject
 	} else if err != nil {
@@ -80,35 +78,35 @@ func GetFromRedis(stateCode string) models.StateObject {
 
 }
 
-func StoreTs(ts time.Time) {
+func StoreTs(ts int64) {
 	fmt.Println("Caching timestamp", ts)
 
-	rdb := getRdb()
-
-	err := rdb.Set(ctx, "timestamp-final", ts, 0).Err()
+	err := RedisConnection.Set(ctx, "timestamp-final", ts, 0).Err()
 
 	if err != nil {
 		panic(err)
 	}
 }
 
-func GetTs() time.Time {
+func GetTs() int64 {
 
 	fmt.Println("Getting last saved timestamp")
 
-	rdb := getRdb()
-
-	value, err := rdb.Get(ctx, "timestamp-final").Result()
+	value, err := RedisConnection.Get(ctx, "timestamp-final").Result()
 	if err != nil {
-		return time.Time{}
+		fmt.Println(err)
+		return 0
 	}
 
-	timeStamp, error := time.Parse(constants.Layout, value)
-	if error != nil {
+	fmt.Println("Timestamp from redis", value)
+
+	timeStamp, err := strconv.ParseInt(value, 10, 64)
+
+	if err != nil {
 		panic(err)
 	}
 
-	fmt.Print("Cached TS is", timeStamp)
+	fmt.Println("Cached TS is", timeStamp)
 
 	return timeStamp
 }

@@ -110,8 +110,8 @@ func isDataUpdatedAtApi(lastUpdated time.Time) bool {
 
 	oldTs := cache.GetTs()
 
-	if oldTs.IsZero() || oldTs.Before(lastUpdated) {
-		cache.StoreTs(lastUpdated)
+	if oldTs < lastUpdated.Unix() {
+		cache.StoreTs(lastUpdated.Unix())
 		return true
 	}
 	return false
