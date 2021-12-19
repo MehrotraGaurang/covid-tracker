@@ -19,7 +19,6 @@ import (
 // @host dry-wave-91626.herokuapp.com
 // @BasePath /
 func main() {
-	fmt.Println("Starting Both APIs")
 
 	// Setting Properties
 	fileutil.ReadPropertiesFile("properties/properties.txt")

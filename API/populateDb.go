@@ -21,7 +21,7 @@ func doEvery(d time.Duration, f func()) {
 
 func StartPopulating() {
 	fmt.Println("Started Populating Db")
-	doEvery(6*time.Hour, populateDb)
+	doEvery(10*time.Minute, populateDb)
 }
 
 func populateDb() {
@@ -68,6 +68,9 @@ func populateDb() {
 	}
 
 	if isDataUpdatedAtApi(lastUpdate) {
+
+		fmt.Println("\nLatest TS has come, updating DB", lastUpdate)
+
 		var indiaObject models.StateObject
 
 		indiaObject.LastUpdated = lastUpdate
